@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Pro Auditor | VITHANALA MANI SRI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .navbar-brand { font-weight: 800; letter-spacing: 1px; }
+        .card { border: none; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .badge-skill { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; padding: 6px 12px; }
+        .footer { background: #212529; color: white; padding: 40px 0; margin-top: 60px; border-top: 4px solid #0d6efd; }
+        .step-box { border-left: 4px solid #0d6efd; padding-left: 20px; margin-bottom: 30px; }
+        .nav-link.active { font-weight: bold; border-bottom: 2px solid #0d6efd; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand text-primary" href="/"><i class="bi bi-cpu-fill"></i> ATS AUDITOR PRO</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link {% if page == 'home' %}active{% endif %}" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link {% if page == 'about' %}active{% endif %}" href="/about">About Project</a></li>
+                <li class="nav-item"><a class="nav-link {% if page == 'process' %}active{% endif %}" href="/process">How it Works</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5 min-vh-100">
+
+    {% if page == 'home' %}
+    <div class="card p-4">
+        <h4 class="mb-4 fw-bold text-dark"><i class="bi bi-file-earmark-arrow-up text-primary"></i> Resume Audit Console</h4>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Select Engineering Branch</label>
+                    <select id="branch" name="branch" class="form-select shadow-sm" required onchange="updateRoles()">
+                        <option value="">-- Select Branch --</option>
+                        {% for branch in branch_data.keys() %}
+                        <option value="{{ branch }}">{{ branch }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Choose Job Role</label>
+                    <select id="job_role" name="job_role" class="form-select shadow-sm" required disabled></select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Resume (PDF)</label>
+                    <input type="file" name="resume" class="form-control shadow-sm" accept=".pdf" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mt-4 py-2 fw-bold shadow">AUDIT COMPATIBILITY</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card p-4 h-100 text-center bg-white border-start border-primary border-5">
+                <h5 class="text-muted small fw-bold text-uppercase">Audit Analyzer Score (ATR)</h5>
+                <div class="display-3 fw-bold text-primary my-2">{{ result.score }}%</div>
+                <h4 class="fw-bold">{{ result.rating }}</h4>
+                <p class="small text-muted mt-3">Keyword Density: <strong>{{ result.density }} / 100 words</strong></p>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card p-4 h-100 bg-white">
+                <h5 class="mb-3 fw-bold text-dark"><i class="bi bi-search me-2 text-primary"></i>Resume SEO & Identity</h5>
+                <p class="small text-muted fw-bold mb-2">IDENTITY THEME WORDS:</p>
+                <div class="mb-3">
+                    {% for theme in result.seo_themes %}
+                    <span class="badge bg-primary px-3 py-2 me-1 mb-1">{{ theme }}</span>
+                    {% endfor %}
+                </div>
+                {% if result.seo_cliches %}
+                <div class="p-3 bg-light rounded border-start border-warning border-4 mt-2">
+                    <p class="small fw-bold text-dark mb-1">⚠️ ALERT WORDS (CLICHES):</p>
+                    {% for word in result.seo_cliches %}
+                    <span class="badge bg-white text-danger border border-danger me-1">{{ word }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card p-4 bg-white">
+                <h5 class="mb-3 fw-bold">🧩 Skill Matching Analysis</h5>
+                <div class="row">
+                    <div class="col-md-6 border-end">
+                        <p class="text-success small fw-bold">✅ PRESENT IN RESUME:</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for s in result.detected %}<span class="badge badge-skill">{{ s }}</span>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <p class="text-danger small fw-bold">❌ MISSING CRITICAL SKILLS:</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for s in result.missing %}<span class="badge bg-danger-subtle text-danger p-2 border border-danger-subtle small">{{ s }}</span>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card shadow-sm overflow-hidden bg-white">
+                <div class="bg-dark text-white p-3 fw-bold">📝 13-Point Structural & Readability Audit</div>
+                <table class="table table-hover mb-0 align-middle">
+                    {% for item in result.checklist %}
+                    <tr>
+                        <td class="ps-4">{{ item.label }}</td>
+                        <td class="text-end pe-4">{% if item.status %}<i class="bi bi-check-circle-fill text-success fs-5"></i>{% else %}<i class="bi bi-x-circle text-danger fs-5"></i>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% elif page == 'about' %}
+    <div class="card p-5 bg-white">
+        <h2 class="text-primary border-bottom pb-3 mb-4">📘 About the Project</h2>
+        <p class="lead">This project is a <strong>Smart Resume Audit and Job Compatibility Analysis System</strong> designed to help students and job seekers understand the strength, quality, and effectiveness of their resume for a selected job role.</p>
+        <p>The main aim of this project is not only to calculate an ATS score, but also to provide a complete resume analysis that explains why a resume is strong or weak and how it can be improved.</p>
+        
+        <h5 class="mt-4 fw-bold text-dark">The system analyzes the resume from multiple important angles:</h5>
+        <div class="list-group list-group-flush mb-4">
+            <div class="list-group-item"><i class="bi bi-bar-chart-fill text-primary me-2"></i>📊 Job compatibility and resume score</div>
+            <div class="list-group-item"><i class="bi bi-search text-primary me-2"></i>🔍 Resume SEO and keyword quality</div>
+            <div class="list-group-item"><i class="bi bi-cpu text-primary me-2"></i>🧠 Professional identity and theme words</div>
+            <div class="list-group-item"><i class="bi bi-grid-fill text-primary me-2"></i>🧩 Skill matching and missing skills</div>
+            <div class="list-group-item"><i class="bi bi-layout-text-sidebar-reverse text-primary me-2"></i>📝 Resume structure, content, and readability</div>
+        </div>
+
+        <p>Overall, this project acts as a <strong>complete resume improvement guide</strong>, helping users build job-ready resumes, improve keyword relevance, and increase their chances of shortlisting.</p>
+    </div>
+
+    {% elif page == 'process' %}
+    <div class="card p-5 bg-white">
+        <h2 class="text-primary border-bottom pb-3 mb-4">⚙️ How the System Works</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="step-box"><h5>1️⃣ Branch Selection 🎓</h5><p class="text-muted">User selects educational background (CSE, AI, ECE, etc.).</p></div>
+                <div class="step-box"><h5>2️⃣ Job Role Selection 💼</h5><p class="text-muted">Select specific target role for requirement matching.</p></div>
+            </div>
+            <div class="col-md-6">
+                <div class="step-box"><h5>3️⃣ Resume Upload 📄⬆️</h5><p class="text-muted">Upload PDF resume for automated parsing.</p></div>
+                <div class="step-box"><h5>4️⃣ Audit Compatibility Click ✅</h5><p class="text-muted">Trigger the 13-point inspection and SEO scan.</p></div>
+            </div>
+        </div>
+        
+        <h3 class="mt-5 mb-4 text-dark border-top pt-4">📊 Resume Analysis Output</h3>
+        <div class="row g-3">
+            <div class="col-md-6"><div class="p-4 border rounded bg-light"><strong>⭐ ATR Score</strong><br>Compatibility percentage against job requirements.</div></div>
+            <div class="col-md-6"><div class="p-4 border rounded bg-light"><strong>🔍 SEO & CEO Analysis</strong><br>Identifies alert words and professional identity themes.</div></div>
+            <div class="col-md-6"><div class="p-4 border rounded bg-light"><strong>🧩 Skill Details</strong><br>Visual breakdown of present vs missing skills.</div></div>
+            <div class="col-md-6"><div class="p-4 border rounded bg-light"><strong>📝 Structural Audit</strong><br>13-point check covering everything from Contact to ATS readability.</div></div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<footer class="footer">
+    <div class="container text-center">
+        <h5 class="text-primary mb-4">Project Developed By</h5>
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-start border-start border-primary ps-4">
+                <p class="mb-1"><i class="bi bi-person-circle me-2"></i><strong>NAME:</strong> VITHANALA MANI SRI</p>
+                <p class="mb-1"><i class="bi bi-bank me-2"></i><strong>COLLEGE:</strong> BONAM VENKATA CHALAMAYYA INSTITUTE OF TECHNOLOGY AND SCIENCE</p>
+                <p class="mb-0"><i class="bi bi-telephone-fill me-2"></i><strong>PH.NO:</strong> 8019321512</p>
+            </div>
+        </div>
+        <hr class="my-4 opacity-25 bg-white">
+        <p class="small text-secondary mb-0">&copy; 2025 Smart Resume Auditor. Refined Industry Standard.</p>
+    </div>
+</footer>
+
+<script>
+    const data = {{ branch_data | tojson | safe if branch_data else '{}' }};
+    function updateRoles() {
+        const branch = document.getElementById("branch").value;
+        const roleSelect = document.getElementById("job_role");
+        roleSelect.innerHTML = '<option value="">-- Choose Role --</option>';
+        if (branch && data[branch]) {
+            roleSelect.disabled = false;
+            Object.keys(data[branch]).forEach(role => {
+                const opt = document.createElement("option"); opt.value = role; opt.textContent = role;
+                roleSelect.appendChild(opt);
+            });
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
